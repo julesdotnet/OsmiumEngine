@@ -34,18 +34,18 @@ public class DrawPanel extends JPanel implements Runnable {
 
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g); // Always call the superclass method first
+        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g.create();
 
         // Create and spawn cuboids
-        ObjectHandler.spawnCuboid(new Cuboid(new Point(102, 0, 0), 150, 60, 50));
-        ObjectHandler.spawnCuboid(new Cuboid(new Point(102, 00, 400), 18, 60, 50));
+        ObjectHandler.spawnCuboid(new Cuboid(new Point(102, 0, 0), 150, 60, 50, Color.red.getRGB()));
+        ObjectHandler.spawnCuboid(new Cuboid(new Point(102, 00, 400), 18, 60, 50, Color.yellow.getRGB()));
 
         Camera camera = Camera.getInstance();
 
         // Position the camera to view the cuboids
-        camera.setPosition(100, -10 + z, 10); // Adjust position if necessary
-        camera.setAngles(90, 50); // Adjust angles if necessary
+        camera.setPosition(70, -10 + z, 10); // Adjust position if necessary
+        camera.setAngles(90, 40); // Adjust angles if necessary
         
         z++;
 

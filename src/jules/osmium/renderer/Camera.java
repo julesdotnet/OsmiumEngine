@@ -60,28 +60,22 @@ public class Camera {
         this.yAngle = yAngle;
     }
 
-    // This method is optimized with multi-threading and thread pooling
     public static void renderView(int width, int height, Graphics g) {
-        // Create a BufferedImage to store the rendered view
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
-        // Precompute constant offsets
-        int offsetX = width / 2;  // Centering the view horizontally
-        int offsetY = height / 2; // Centering the view vertically
+        int offsetX = width / 2;
+        int offsetY = height / 2;
         int rayDepth = 650;
 
-        // Precompute trigonometric values for camera angles to avoid recalculating for each pixel
         double cosYAngle = Math.cos(Math.toRadians(camera.getYAngle()));
         double sinYAngle = Math.sin(Math.toRadians(camera.getYAngle()));
         double sinXAngle = Math.sin(Math.toRadians(camera.getXAngle()));
 
-        // Use a thread pool to manage multiple threads efficiently
-        int numThreads = Runtime.getRuntime().availableProcessors(); // Use all available cores
+        int numThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-        Point origin = camera.getPosition(); // Use camera's position
+        Point origin = camera.getPosition();
 
-        // Split the workload into segments, each segment handled by a thread
         int segmentHeight = height / numThreads;
 
         for (int threadId = 0; threadId < numThreads; threadId++) {
@@ -89,11 +83,9 @@ public class Camera {
             final int endY = (threadId == numThreads - 1) ? height : startY + segmentHeight;
 
             executor.submit(() -> {
-                // This block will be executed by a separate thread
-                Point rayTarget = new Point(0, 0, 50); // Local reusable rayTarget
+                Point rayTarget = new Point(0, 0, 50);
                 for (int y = startY; y < endY; y++) {
                     for (int x = 0; x < width; x++) {
-                        // Update the ray target for the current pixel based on precomputed angles
                         double xOffset = (x - offsetX) * cosYAngle;
                         double zOffset = (x - offsetX) * sinYAngle;
                         double yOffset = (y - offsetY) * sinXAngle;
@@ -105,13 +97,9 @@ public class Camera {
                         RaycastHit target = Raycast.castRay(origin, rayTarget, rayDepth);
 
                         if (target != null) {
-                            // Calculate color based on the distance to the target point
-                            double distance = target.getPoint().distanceTo(origin);
-                            int color = (distance > 150) ? Color.RED.getRGB() : Color.YELLOW.getRGB();
-                            color = (distance > 300) ? Color.GREEN.getRGB() : color;
 
                             // Set the color of the pixel in the buffered image
-                            bufferedImage.setRGB(x, y, color);
+                            bufferedImage.setRGB(x, y, target.getColor());
                         }
                     }
                 }

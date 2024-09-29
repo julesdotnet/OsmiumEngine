@@ -7,14 +7,15 @@ public class Cuboid {
 	private double width;
 	private double length;
 	private double depth;
-	private String material;
+	private int color;
 	
-	public Cuboid(Point location, double width, double length, double depth) {
+	public Cuboid(Point location, double width, double length, double depth, int color) {
 		this.location = location;
 		this.width = width;
 		this.length= length;
 		this.depth = depth;
-		setMaterial("RED");
+		this.color = color;
+		setColor(color);
 	}
 	
 	public Point getLocation() {
@@ -33,12 +34,12 @@ public class Cuboid {
 		return depth;
 	}
 	
-	public String getMaterial() {
-		return material;
+	public int getColor() {
+		return color;
 	}
 	
-	public void setMaterial(String newMat) {
-		material = newMat;
+	public void setColor(int newCol) {
+		color = newCol;
 	}
 	
 	public boolean contains(Point point) {
