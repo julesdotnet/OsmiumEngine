@@ -53,8 +53,8 @@ public class Camera {
     public static void renderView(int width, int height, double depth, Graphics g) {
         BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         
-        double angleX = 1.6; // Horizontal field of view adjustment
-        double angleY = 1.4; // Vertical field of view adjustment
+        double angleX = 1.4; // Horizontal field of view adjustment
+        double angleY = 1.18; // Vertical field of view adjustment
         
         Point rayTarget = new Point(0, 0, 0);
         
@@ -70,7 +70,11 @@ public class Camera {
                 if (hit != null) {
                     int color = hit.getColor();
                     // Set the pixel color in the BufferedImage
-                    view.setRGB(i + (width / 2), j + (height / 2), color);
+                    try {
+                    	view.setRGB(i + width / 2, j + height / 2, color);	
+                    } catch(ArrayIndexOutOfBoundsException e) {
+                    	e.printStackTrace();
+                    }
                 }
             }
         }

@@ -35,19 +35,23 @@ public class DrawPanel extends JPanel implements Runnable {
 			renderThread = new Thread(this);
 			renderThread.start(); // Start the thread here
 		}
+		Cuboid testCuboid = new Cuboid(new Point(100 - x, 10, 30 + x), 40, 20, 60, Color.red.getRGB());
+		ObjectHandler.spawnCuboid(testCuboid);
 	}
-
+	int x = 0;
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g.create();
 
-		// Create and spawn cuboids
-		ObjectHandler.spawnCuboid(new Cuboid(new Point(30, 5, 30), 40, 20, 60, Color.red.getRGB()));
-	
-		Camera.renderView(getWidth(), getHeight(), 1000, g);
+		// Create and spawn cuboid
+		for(Cuboid cuboid : ObjectHandler.getCuboids()) {
+			cuboid.setLocation(cuboid.getLocation().getX() - x, cuboid.getLocation().getY(), cuboid.getLocation().getZ());
+		}
+		x++;
+		Camera.renderView(getWidth(), getHeight(), 1200, g);
 		g2.dispose();
-	}
+	} 
 
 	@Override
 	public void run() {

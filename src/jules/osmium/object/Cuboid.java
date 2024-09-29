@@ -82,4 +82,9 @@ public class Cuboid {
 		vertices[6] = new Point(startX, startY + height, startZ + depth);
 		vertices[7] = new Point(startX + width, startY + height, startZ + depth);
 	}
+
+	public void setLocation(double x, double y, double z) {
+		location = new Point(x, y, z);
+		
+	}
 }
