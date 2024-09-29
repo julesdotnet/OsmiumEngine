@@ -13,71 +13,74 @@ import jules.osmium.object.Point;
 import jules.osmium.renderer.Camera;
 
 public class DrawPanel extends JPanel implements Runnable {
-    private static final long serialVersionUID = 1L;
-    int z = 0;
+	private static final long serialVersionUID = 1L;
+	double z = 0;
 
-    private Thread renderThread;
-    private volatile boolean running = true; // Control flag for the thread
+	private long lastTime = System.nanoTime();
+	private long lastFPSUpdateTime = System.nanoTime();
+	private int frames = 0;
+	int fps = 0;
+	
+	private Thread renderThread;
+	private volatile boolean running = true; // Control flag for the thread
 
-    public DrawPanel() {
-        setPreferredSize(new Dimension(800, 500));
-        setBackground(Color.blue);
-        setDoubleBuffered(true);
-    }
+	public DrawPanel() {
+		setPreferredSize(new Dimension(800, 500));
+		setBackground(Color.blue);
+		setDoubleBuffered(true);
+	}
 
-    public void startRenderThread() {
-        if (renderThread == null) {
-            renderThread = new Thread(this);
-            renderThread.start(); // Start the thread here
-        }
-    }
+	public void startRenderThread() {
+		if (renderThread == null) {
+			renderThread = new Thread(this);
+			renderThread.start(); // Start the thread here
+		}
+	}
 
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g.create();
+	@Override
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2 = (Graphics2D) g.create();
 
-        // Create and spawn cuboids
-        ObjectHandler.spawnCuboid(new Cuboid(new Point(102, 0, 0), 150, 60, 50, Color.red.getRGB()));
-        ObjectHandler.spawnCuboid(new Cuboid(new Point(102, 00, 400), 18, 60, 50, Color.yellow.getRGB()));
+		// Create and spawn cuboids
+		ObjectHandler.spawnCuboid(new Cuboid(new Point(30, 5, 30), 40, 20, 60, Color.red.getRGB()));
+	
+		Camera.renderView(getWidth(), getHeight(), 1000, g);
+		g2.dispose();
+	}
 
-        Camera camera = Camera.getInstance();
+	@Override
+	public void run() {
+		int TARGET_FPS = 120;
+		final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
 
-        // Position the camera to view the cuboids
-        camera.setPosition(70, -10 + z, 10); // Adjust position if necessary
-        camera.setAngles(90, 40); // Adjust angles if necessary
-        
-        z++;
+		while (running) {
+			long now = System.nanoTime();
+			lastTime = now;
 
-        // Render the camera view
-        Camera.renderView(getWidth(), getHeight(), g2);
-        g2.dispose();
-    }
+			frames++;
+			if (now - lastFPSUpdateTime >= 1000000000) {
+				fps = frames;
+				frames = 0;
+				lastFPSUpdateTime += 1000000000;
+			}
+			SwingUtilities.invokeLater(() -> repaint());
+			try {
+				long sleepTime = (lastTime - System.nanoTime() + OPTIMAL_TIME) / 1000000;
+				if (sleepTime > 0) {
+					Thread.sleep(sleepTime);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    @Override
-    public void run() {
-        while (running) {
-            // Update z and y for animation or movement // Move z inside for thread control
-            // Ensure thread-safe repainting
-            z++; // Update z position
-            // y -= 5; // If y is needed for something, adjust accordingly
-            
-            // Request the panel to repaint on the Event Dispatch Thread
-            SwingUtilities.invokeLater(this::repaint);
-
-            try {
-                Thread.sleep(300); // Control frame rate, adjust as necessary
-            } catch (InterruptedException e) {
-                running = false; // Stop the thread on interrupt
-            }
-        }
-    }
-
-    // Optional method to stop the render thread gracefully
-    public void stopRenderThread() {
-        running = false; // Set the running flag to false
-        if (renderThread != null) {
-            renderThread.interrupt(); // Interrupt the thread if it's sleeping
-        }
-    }
+	// Optional method to stop the render thread gracefully
+	public void stopRenderThread() {
+		running = false; // Set the running flag to false
+		if (renderThread != null) {
+			renderThread.interrupt(); // Interrupt the thread if it's sleeping
+		}
+	}
 }

@@ -41,4 +41,11 @@ public class Point {
 	public void setZ(double newZ) {
 		z = newZ;
 	}
+
+	public void setLocation(double x, double y, int z) {
+		setX(x);
+		setY(y);
+		setZ(z);
+		
+	}
 }

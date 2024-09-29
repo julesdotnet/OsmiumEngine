@@ -22,7 +22,7 @@ public class Raycast {
 		rayDirection.normalize();
 
 		Point currentPoint = new Point(start.getX(), start.getY(), start.getZ());
-		double normalStepSize = 5;
+		double normalStepSize = 1;
 		double proximityStepSize = 0.1;
 
 		// Calculate total steps to take
@@ -34,9 +34,12 @@ public class Raycast {
 			currentPoint.setY(currentPoint.getY() + rayDirection.getY() * normalStepSize);
 			currentPoint.setZ(currentPoint.getZ() + rayDirection.getZ() * normalStepSize);
 			
-			for(Cuboid object : ObjectHandler.getCuboids()) {
+			for(Cuboid object : ObjectHandler.getCuboids()) { 
 				if(object.contains(currentPoint)) {
-					currentPoint = new Point(start.getX(), start.getY(), start.getZ());
+					// Update current point using the direction vector
+					currentPoint.setX(currentPoint.getX() - rayDirection.getX() * normalStepSize);
+					currentPoint.setY(currentPoint.getY() - rayDirection.getY() * normalStepSize);
+					currentPoint.setZ(currentPoint.getZ() - rayDirection.getZ() * normalStepSize);
 					
 					while(!object.contains(currentPoint)) {
 						currentPoint.setX(currentPoint.getX() + rayDirection.getX() * proximityStepSize);
@@ -46,7 +49,6 @@ public class Raycast {
 					return new RaycastHit(currentPoint, object.getColor());
 				}
 			}
-
 		}
 		return null;
 	}
