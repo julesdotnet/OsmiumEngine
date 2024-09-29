@@ -8,6 +8,8 @@ public class Cuboid {
 	private double length;
 	private double depth;
 	private int color;
+	private Point[] vertices = new Point[8];
+	
 	
 	public Cuboid(Point location, double width, double length, double depth, int color) {
 		this.location = location;
@@ -16,6 +18,7 @@ public class Cuboid {
 		this.depth = depth;
 		this.color = color;
 		setColor(color);
+		generateVertices();
 	}
 	
 	public Point getLocation() {
@@ -57,4 +60,26 @@ public class Cuboid {
 	           (point.getZ() >= minZ && point.getZ() <= maxZ);
 	}
 	
+	public Point[] getVertices() {
+		return vertices;
+	}
+	
+	private void generateVertices() {
+		double startX = getLocation().getX();
+		double startY = getLocation().getY();
+		double startZ = getLocation().getZ();
+
+		double width = getWidth(); 
+		double height = getLength();
+		double depth = getDepth();
+
+		vertices[0] = new Point(startX, startY, startZ);
+		vertices[1] = new Point(startX + width, startY, startZ);
+		vertices[2] = new Point(startX, startY + height, startZ);
+		vertices[3] = new Point(startX, startY, startZ + depth);
+		vertices[4] = new Point(startX + width, startY + height, startZ);
+		vertices[5] = new Point(startX + width, startY, startZ + depth);
+		vertices[6] = new Point(startX, startY + height, startZ + depth);
+		vertices[7] = new Point(startX + width, startY + height, startZ + depth);
+	}
 }

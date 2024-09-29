@@ -22,7 +22,8 @@ public class Raycast {
 		rayDirection.normalize();
 
 		Point currentPoint = new Point(start.getX(), start.getY(), start.getZ());
-		double normalStepSize = 4;
+		double normalStepSize = 5;
+		double proximityStepSize = 0.1;
 
 		// Calculate total steps to take
 		int steps = (int) Math.min(rayLength / normalStepSize, maxDistance / normalStepSize);
@@ -32,14 +33,20 @@ public class Raycast {
 			currentPoint.setX(currentPoint.getX() + rayDirection.getX() * normalStepSize);
 			currentPoint.setY(currentPoint.getY() + rayDirection.getY() * normalStepSize);
 			currentPoint.setZ(currentPoint.getZ() + rayDirection.getZ() * normalStepSize);
-
-			// Check intersection with all cuboids
-			for (Cuboid cuboid : ObjectHandler.getCuboids()) {
-				// Check if current point is within the cuboid's bounding box
-				if (cuboid.contains(currentPoint)) {
-					return new RaycastHit(currentPoint, cuboid.getColor());
+			
+			for(Cuboid object : ObjectHandler.getCuboids()) {
+				if(object.contains(currentPoint)) {
+					currentPoint = new Point(start.getX(), start.getY(), start.getZ());
+					
+					while(!object.contains(currentPoint)) {
+						currentPoint.setX(currentPoint.getX() + rayDirection.getX() * proximityStepSize);
+						currentPoint.setY(currentPoint.getY() + rayDirection.getY() * proximityStepSize);
+						currentPoint.setZ(currentPoint.getZ() + rayDirection.getZ() * proximityStepSize);
+					}
+					return new RaycastHit(currentPoint, object.getColor());
 				}
 			}
+
 		}
 		return null;
 	}
