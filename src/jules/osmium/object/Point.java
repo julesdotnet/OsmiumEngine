@@ -42,10 +42,10 @@ public class Point {
 		z = newZ;
 	}
 
-	public void setLocation(double x, double y, int z) {
+	public void setLocation(double x, double y, double z2) {
 		setX(x);
 		setY(y);
-		setZ(z);
+		setZ(z2);
 		
 	}
 }

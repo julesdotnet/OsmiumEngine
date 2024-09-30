@@ -22,7 +22,7 @@ public class Raycast {
 		rayDirection.normalize();
 
 		Point currentPoint = new Point(start.getX(), start.getY(), start.getZ());
-		double normalStepSize = 1;
+		double normalStepSize = 0.9;
 		double proximityStepSize = 0.1;
 
 		// Calculate total steps to take
