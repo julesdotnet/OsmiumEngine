@@ -7,7 +7,7 @@ public class RaycastHit {
 	private Point point;
 	
 	public RaycastHit(Point point, int color) {
-		System.out.println("casted ray collided at x: " + point.getX() + " y: " + point.getY() + " z: " + point.getZ());
+		//System.out.println("casted ray collided at x: " + point.getX() + " y: " + point.getY() + " z: " + point.getZ());
 		this.color = color;
 		this.point = point;
 	}

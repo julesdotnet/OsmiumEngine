@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import jules.osmium.main.DrawPanel;
+import jules.osmium.main.KeyInput;
 import jules.osmium.object.Point;
 
 public class Camera {
@@ -19,13 +21,14 @@ public class Camera {
     private static Camera camera;
 
     // Camera position in 3D space
-    private static Point position;
+    private static Point position = new Point(0, 0, 100);;
+	
+	protected static KeyInput keyInput = new KeyInput();
 
     private Camera(double xAngle, double yAngle, double depthOfView) {
         Camera.xAngle = xAngle;
         Camera.yAngle = yAngle;
-        this.depthOfView = depthOfView; // Initialize camera position
-        position = new Point(0, 0, 100); // Set initial camera position
+        this.depthOfView = depthOfView;
     }
 
     public static Camera getInstance() {
@@ -37,6 +40,16 @@ public class Camera {
 
     public double getXAngle() {
         return xAngle;
+    }
+    
+    public static void changeX(double xAdd) {
+    	Camera.getInstance();
+		Camera.position.setX(xAdd);
+    }
+    
+    public static void changeZ(double zAdd) {
+    	Camera.getInstance();
+		Camera.position.setZ(zAdd);
     }
     
     public static void setYaw(double newYaw) {
@@ -65,13 +78,24 @@ public class Camera {
     }
     static double yOffset = 0;
 
-    public static void renderView(int width, int height, double depth, Graphics g) {
-    	yOffset -= 40;
-    	
+    public static void renderView(int width, int height, double depth, double fov, Graphics g) {
+        yOffset -= 40;
+        
+        Camera.setYaw(DrawPanel.mi.cameraYaw);
+
         BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        double angleX = 1.3; // Horizontal field of view adjustment
-        double angleY = 1.15 ; // Vertical field of view adjustment
+        // Dynamic field of view calculation
+        double aspectRatio = (double) width / height;
+
+        // FOV is usually in degrees, convert it to radians
+        double horizontalFovRadians = Math.toRadians(fov);
+        
+        // Horizontal angle (angleX) is derived from horizontal FOV
+        double angleX = 2 * Math.tan(horizontalFovRadians / 2);
+
+        // Vertical angle (angleY) based on aspect ratio and horizontal angle
+        double angleY = angleX / aspectRatio;
 
         int numThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
@@ -92,23 +116,23 @@ public class Camera {
 
                 for (int i = -width / 2; i < width / 2; i += 6) {
                     for (int j = startHeight - height / 2; j < endHeight - height / 2; j++) {
-                    	 double originalX = i * angleX; // X before rotation
-                         double originalY = j * angleY; // Y before rotation
-                         double originalZ = 200;        // Z before rotation (assuming 200 is some depth constant)
+                        double originalX = i * angleX; // X before rotation
+                        double originalY = j * angleY; // Y before rotation
+                        double originalZ = 200;        // Z before rotation (assuming 200 is some depth constant)
 
-                         // First, apply yaw rotation around the Y-axis
-                         double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + originalZ * Math.sin(Math.toRadians(yaw));
-                         double zAfterYaw = originalZ * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
-                         double yAfterYaw = originalY;  // Y remains the same after yaw rotation
+                        // First, apply yaw rotation around the Y-axis
+                        double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + originalZ * Math.sin(Math.toRadians(yaw));
+                        double zAfterYaw = originalZ * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
+                        double yAfterYaw = originalY;  // Y remains the same after yaw rotation
 
-                         // Next, apply pitch rotation around the X-axis
-                         double yAfterPitch = yAfterYaw * Math.cos(Math.toRadians(pitch)) - zAfterYaw * Math.sin(Math.toRadians(pitch));
-                         double zAfterPitch = yAfterYaw * Math.sin(Math.toRadians(pitch)) + zAfterYaw * Math.cos(Math.toRadians(pitch));
-                        
-                         rayTarget[0].setLocation(xAfterYaw * angleX, yAfterPitch, zAfterPitch);
-                         for (int k = 1; k < rayTarget.length; k++) {
-                             rayTarget[k].setLocation((xAfterYaw + k) * angleX, yAfterPitch, zAfterPitch);
-                         }
+                        // Next, apply pitch rotation around the X-axis
+                        double yAfterPitch = yAfterYaw * Math.cos(Math.toRadians(pitch)) - zAfterYaw * Math.sin(Math.toRadians(pitch));
+                        double zAfterPitch = yAfterYaw * Math.sin(Math.toRadians(pitch)) + zAfterYaw * Math.cos(Math.toRadians(pitch));
+
+                        rayTarget[0].setLocation(xAfterYaw * angleX, yAfterPitch, zAfterPitch);
+                        for (int k = 1; k < rayTarget.length; k++) {
+                            rayTarget[k].setLocation((xAfterYaw + k) * angleX, yAfterPitch, zAfterPitch);
+                        }
 
                         // Cast the ray and check for hits
                         RaycastHit[] hits = new RaycastHit[6];
@@ -151,4 +175,5 @@ public class Camera {
         // Draw the generated BufferedImage onto the provided Graphics object
         g.drawImage(view, 0, 0, null);
     }
+
 }
