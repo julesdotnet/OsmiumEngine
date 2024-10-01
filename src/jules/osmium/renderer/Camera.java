@@ -82,28 +82,23 @@ public class Camera {
         yOffset -= 40;
         
         Camera.setYaw(DrawPanel.mi.cameraYaw);
+        Camera.setPitch(-DrawPanel.mi.cameraPitch);
 
         BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        // Dynamic field of view calculation
         double aspectRatio = (double) width / height;
 
-        // FOV is usually in degrees, convert it to radians
         double horizontalFovRadians = Math.toRadians(fov);
-        
-        // Horizontal angle (angleX) is derived from horizontal FOV
+
         double angleX = 2 * Math.tan(horizontalFovRadians / 2);
 
-        // Vertical angle (angleY) based on aspect ratio and horizontal angle
         double angleY = angleX / aspectRatio;
 
         int numThreads = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-        // Calculate the height segment for each thread
         int segmentHeight = height / numThreads;
 
-        // Split work between threads
         for (int threadId = 0; threadId < numThreads; threadId++) {
             final int startHeight = threadId * segmentHeight;
             final int endHeight = (threadId == numThreads - 1) ? height : startHeight + segmentHeight;
@@ -116,16 +111,14 @@ public class Camera {
 
                 for (int i = -width / 2; i < width / 2; i += 6) {
                     for (int j = startHeight - height / 2; j < endHeight - height / 2; j++) {
-                        double originalX = i * angleX; // X before rotation
-                        double originalY = j * angleY; // Y before rotation
-                        double originalZ = 200;        // Z before rotation (assuming 200 is some depth constant)
+                        double originalX = i * angleX;
+                        double originalY = j * angleY;
+                        double originalZ = 200;       
 
-                        // First, apply yaw rotation around the Y-axis
                         double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + originalZ * Math.sin(Math.toRadians(yaw));
                         double zAfterYaw = originalZ * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
-                        double yAfterYaw = originalY;  // Y remains the same after yaw rotation
+                        double yAfterYaw = originalY;
 
-                        // Next, apply pitch rotation around the X-axis
                         double yAfterPitch = yAfterYaw * Math.cos(Math.toRadians(pitch)) - zAfterYaw * Math.sin(Math.toRadians(pitch));
                         double zAfterPitch = yAfterYaw * Math.sin(Math.toRadians(pitch)) + zAfterYaw * Math.cos(Math.toRadians(pitch));
 
@@ -172,7 +165,6 @@ public class Camera {
             Thread.currentThread().interrupt();
         }
 
-        // Draw the generated BufferedImage onto the provided Graphics object
         g.drawImage(view, 0, 0, null);
     }
 
