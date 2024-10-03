@@ -20,6 +20,7 @@ public class DrawPanel extends JPanel implements Runnable {
 	private long lastFPSUpdateTime = System.nanoTime();
 	private int frames = 0;
 	int fps = 0;
+	private static int speed = 3;
 
 	private Thread renderThread;
 	private volatile boolean running = true;
@@ -45,7 +46,15 @@ public class DrawPanel extends JPanel implements Runnable {
 			renderThread.start();
 		}
 		Cuboid testCuboid = new Cuboid(new Point(30, 5, 100), 80, 60, 60, Color.ORANGE.getRGB());
+		Cuboid testCuboid2 = new Cuboid(new Point(0, 5, 0), 80, 10, 60, Color.RED.getRGB());
+		Cuboid testCuboid3 = new Cuboid(new Point(70, 30, 10), 90, 20, 60, Color.GREEN.getRGB());
+		Cuboid testCuboid4 = new Cuboid(new Point(100, 50, 10), 30, 20, 60, Color.PINK.getRGB());
+		Cuboid testCuboid5 = new Cuboid(new Point(-30, 50, 50), 30, 20, 60, Color.YELLOW.getRGB());
 		ObjectHandler.spawnCuboid(testCuboid);
+		ObjectHandler.spawnCuboid(testCuboid2);
+		ObjectHandler.spawnCuboid(testCuboid3);
+		ObjectHandler.spawnCuboid(testCuboid4);
+		ObjectHandler.spawnCuboid(testCuboid5);
 	}
 
 	float x = 0;
@@ -54,28 +63,23 @@ public class DrawPanel extends JPanel implements Runnable {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g.create();
-		
+
 		Camera.setYaw(0);
 
-		for (Cuboid cuboid : ObjectHandler.getCuboids()) {
-			if (DrawPanel.ki.getWPressed()) {
-				cuboid.setLocation(cuboid.getLocation().getX(), cuboid.getLocation().getY(),
-						cuboid.getLocation().getZ() - 1);
-			}
-			
-			if (DrawPanel.ki.getSPressed()) {
-				cuboid.setLocation(cuboid.getLocation().getX(), cuboid.getLocation().getY(),
-						cuboid.getLocation().getZ() + 1);
-			}
-			if (DrawPanel.ki.getAPressed()) {
-				cuboid.setLocation(cuboid.getLocation().getX() + 2, cuboid.getLocation().getY(),
-						cuboid.getLocation().getZ());
-			}
-			
-			if (DrawPanel.ki.getDPressed()) {
-				cuboid.setLocation(cuboid.getLocation().getX() - 2, cuboid.getLocation().getY(),
-						cuboid.getLocation().getZ());
-			}
+		if (DrawPanel.ki.getWPressed()) {
+			Camera.changeZ(speed);
+		}
+
+		if (DrawPanel.ki.getSPressed()) {
+			Camera.changeZ(-speed);
+		}
+		if (DrawPanel.ki.getAPressed()) {
+			Camera.changeX(-speed);
+		}
+
+		if (DrawPanel.ki.getDPressed()) {
+			Camera.changeX(speed);
+
 		}
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
 		g2.dispose();
@@ -97,10 +101,6 @@ public class DrawPanel extends JPanel implements Runnable {
 				lastFPSUpdateTime += 1000000000;
 			}
 			SwingUtilities.invokeLater(() -> repaint());
-
-			if (ki.getAPressed()) {
-				System.out.println("a pressed");
-			}
 			try {
 				long sleepTime = (lastTime - System.nanoTime() + OPTIMAL_TIME) / 1000000;
 				if (sleepTime > 0) {

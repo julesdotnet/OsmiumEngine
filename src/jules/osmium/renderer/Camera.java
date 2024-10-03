@@ -15,15 +15,14 @@ public class Camera {
     private static double yAngle;
     private double depthOfView;
     public static double angularOffsetX = 0;
-	static double yaw = -10;
-	static double pitch = -10;
+    static double yaw = -10;
+    static double pitch = -10;
 
     private static Camera camera;
 
-    // Camera position in 3D space
-    private static Point position = new Point(0, 0, 100);;
-	
-	protected static KeyInput keyInput = new KeyInput();
+    private static Point position = new Point(0, 0, 0);
+
+    protected static KeyInput keyInput = new KeyInput();
 
     private Camera(double xAngle, double yAngle, double depthOfView) {
         Camera.xAngle = xAngle;
@@ -41,23 +40,21 @@ public class Camera {
     public double getXAngle() {
         return xAngle;
     }
-    
+
     public static void changeX(double xAdd) {
-    	Camera.getInstance();
-		Camera.position.setX(xAdd);
+        Camera.position.setX(Camera.position.getX() + xAdd);
     }
-    
+
     public static void changeZ(double zAdd) {
-    	Camera.getInstance();
-		Camera.position.setZ(zAdd);
+    	 Camera.position.setZ(Camera.position.getZ() + zAdd);
     }
-    
+
     public static void setYaw(double newYaw) {
-    	yaw = newYaw;
+        yaw = newYaw;
     }
-    
+
     public static void setPitch(double newPitch) {
-    	pitch = newPitch;
+        pitch = newPitch;
     }
 
     public double getYAngle() {
@@ -76,11 +73,14 @@ public class Camera {
         Camera.xAngle = xAngle;
         Camera.yAngle = yAngle;
     }
+
     static double yOffset = 0;
 
     public static void renderView(int width, int height, double depth, double fov, Graphics g) {
         yOffset -= 40;
         
+        getPosition();
+
         Camera.setYaw(DrawPanel.mi.cameraYaw);
         Camera.setPitch(-DrawPanel.mi.cameraPitch);
 
@@ -113,24 +113,26 @@ public class Camera {
                     for (int j = startHeight - height / 2; j < endHeight - height / 2; j++) {
                         double originalX = i * angleX;
                         double originalY = j * angleY;
-                        double originalZ = 200;       
+                        double originalZ = 200;  // Distance from the camera (depth)
 
+                        // Step 1: Apply yaw rotation (rotation around Y-axis)
                         double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + originalZ * Math.sin(Math.toRadians(yaw));
                         double zAfterYaw = originalZ * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
                         double yAfterYaw = originalY;
 
+
                         double yAfterPitch = yAfterYaw * Math.cos(Math.toRadians(pitch)) - zAfterYaw * Math.sin(Math.toRadians(pitch));
                         double zAfterPitch = yAfterYaw * Math.sin(Math.toRadians(pitch)) + zAfterYaw * Math.cos(Math.toRadians(pitch));
 
+                        // Set ray target coordinates after yaw and pitch
                         rayTarget[0].setLocation(xAfterYaw * angleX, yAfterPitch, zAfterPitch);
                         for (int k = 1; k < rayTarget.length; k++) {
                             rayTarget[k].setLocation((xAfterYaw + k) * angleX, yAfterPitch, zAfterPitch);
                         }
 
-                        // Cast the ray and check for hits
                         RaycastHit[] hits = new RaycastHit[6];
                         for (int k = 0; k < rayTarget.length; k++) {
-                            hits[k] = Raycast.castRay(new Point(0, 0, 0), rayTarget[k], depth);
+                            hits[k] = Raycast.castRay(getPosition(), rayTarget[k], depth);
                         }
 
                         try {
@@ -157,7 +159,6 @@ public class Camera {
             });
         }
 
-        // Wait for all threads to complete
         executor.shutdown();
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -167,5 +168,4 @@ public class Camera {
 
         g.drawImage(view, 0, 0, null);
     }
-
 }

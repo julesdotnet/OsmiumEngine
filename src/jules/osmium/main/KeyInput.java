@@ -7,7 +7,6 @@ public class KeyInput implements KeyListener{
 	private boolean wPressed = false, aPressed = false, sPressed = false, dPressed = false;
 	@Override
 	public void keyTyped(KeyEvent e) {
-		System.out.println("hellofasdddddd");
 		
 	}
 
@@ -16,7 +15,6 @@ public class KeyInput implements KeyListener{
 		switch(e.getKeyCode()) {
 		case KeyEvent.VK_W:
 			wPressed = true;
-			System.out.println("w pressed");
 			break;
 		case KeyEvent.VK_A:
 			aPressed = true;
@@ -36,7 +34,6 @@ public class KeyInput implements KeyListener{
 		switch(e.getKeyCode()) {
 		case KeyEvent.VK_W:
 			wPressed = false;
-			System.out.println("RAAAHHH I AM FUMING");
 			break;
 		case KeyEvent.VK_A:
 			aPressed = false;
