@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import jules.osmium.main.DrawPanel;
 import jules.osmium.main.KeyInput;
 import jules.osmium.object.Point;
+import jules.osmium.object.Vector;
 
 public class Camera {
 	private static double xAngle;
@@ -20,7 +21,9 @@ public class Camera {
 	public static double angularOffsetX = 0;
 	static double yaw = -10;
 	static double pitch = -10;
-
+	
+	private static double directionVectorX = 0;
+	private static double directionVectorZ = 0;
     private static int rayStepX = 3; 
     private static int rayStepY = 3;
 
@@ -84,7 +87,21 @@ public class Camera {
 		Camera.xAngle = xAngle;
 		Camera.yAngle = yAngle;
 	}
+	
+	public static Vector cameraDirection2D() {
+		Vector v = new Vector(directionVectorX, 0, directionVectorZ);
+		
+		v.normalize();
+		
+		return v;
+	}
 
+	public static void moveByVector(Vector v) {
+		position.setX(position.getX() + v.getX());
+		position.setY(position.getY() + v.getY());
+		position.setZ(position.getZ() + v.getZ());
+	}
+	
 	static double yOffset = 0;
 
 	public static void renderView(int width, int height, double depth, double fov, Graphics g) {
@@ -131,6 +148,9 @@ public class Camera {
 
 	                    double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + zAfterPitch * Math.sin(Math.toRadians(yaw));
 	                    double zAfterYaw = zAfterPitch * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
+	                    
+	                    directionVectorX = originalX * Math.sin(Math.toRadians(yaw));
+	                    directionVectorZ = originalZ * Math.cos(Math.toRadians(yaw));
 
 	                    rayTarget[0].setLocation(xAfterYaw, yAfterPitch, zAfterYaw);
 	                    for (int k = 1; k < rayTarget.length; k++) {

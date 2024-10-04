@@ -21,15 +21,35 @@ public class Vector {
 	}
 	
 	 public void normalize() {
-	        double len = length(); // Get the length of the vector
-	        if (len != 0) { // Avoid division by zero
-	            x /= len; // Normalize x component
-	            y /= len; // Normalize y component
-	            z /= len; // Normalize z component
+	        double len = length();
+	        if (len != 0) {
+	            x /= len;
+	            y /= len;
+	            z /= len;
 	        }
 	    }
 
-	
+	public Vector reverse() {
+		x = (-getX());
+		y = (-getY());
+		z = (-getZ());
+		
+		return this;
+	}
+	public Vector getLeftPerpendicular() {
+	    double newX = -getZ();  // Swap X and Z, negate Z
+	    double newZ = getX();
+	    
+	    return new Vector(newX, 0, newZ);  // Y remains 0 since we're in 2D
+	}
+
+	public Vector getRightPerpendicular() {
+	    double newX = getZ();  // Swap X and Z, negate X
+	    double newZ = -getX();
+	    
+	    return new Vector(newX, 0, newZ);  // Y remains 0
+	}
+
 	public double getY() {
 		return y;
 	}

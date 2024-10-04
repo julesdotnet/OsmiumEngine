@@ -46,6 +46,11 @@ public class Point {
 		setX(x);
 		setY(y);
 		setZ(z2);
-		
+	}
+	
+	public void moveByVector(Vector v) {
+		setX(x + v.getX());
+		setY(y + v.getY());
+		setZ(z + v.getZ());
 	}
 }

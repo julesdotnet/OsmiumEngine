@@ -67,18 +67,18 @@ public class DrawPanel extends JPanel implements Runnable {
 		Camera.setYaw(0);
 
 		if (DrawPanel.ki.getWPressed()) {
-			Camera.changeZ(speed);
+			Camera.moveByVector(Camera.cameraDirection2D());
 		}
 
 		if (DrawPanel.ki.getSPressed()) {
-			Camera.changeZ(-speed);
+			Camera.moveByVector(Camera.cameraDirection2D().reverse());
 		}
 		if (DrawPanel.ki.getAPressed()) {
-			Camera.changeX(-speed);
+			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular());
 		}
 
 		if (DrawPanel.ki.getDPressed()) {
-			Camera.changeX(speed);
+			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular());
 
 		}
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
