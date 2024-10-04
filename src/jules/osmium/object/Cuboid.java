@@ -1,7 +1,5 @@
 package jules.osmium.object;
 
-import java.awt.Graphics2D;
-
 public class Cuboid {
 	private Point location;
 	private double width;

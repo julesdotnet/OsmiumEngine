@@ -4,10 +4,6 @@ package jules.osmium.main;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import jules.osmium.object.Cuboid;
-import jules.osmium.object.ObjectHandler;
-import jules.osmium.object.Point;
-
 public class Window extends JFrame{
 	private static final long serialVersionUID = 1L;
 	

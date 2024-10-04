@@ -2,6 +2,8 @@ package jules.osmium.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,8 +21,8 @@ public class Camera {
 	static double yaw = -10;
 	static double pitch = -10;
 
-    private static int rayStepX = 4; 
-    private static int rayStepY = 4;
+    private static int rayStepX = 3; 
+    private static int rayStepY = 3;
 
 	private static Camera camera;
 
@@ -86,6 +88,8 @@ public class Camera {
 	static double yOffset = 0;
 
 	public static void renderView(int width, int height, double depth, double fov, Graphics g) {
+	    Graphics2D g2 = (Graphics2D) g.create();
+	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    yOffset -= 40;
 	    getPosition();
 
@@ -122,20 +126,15 @@ public class Camera {
 	                    double originalY = j * angleY;
 	                    double originalZ = 200;
 
-	                    double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw))
-	                            + originalZ * Math.sin(Math.toRadians(yaw));
-	                    double zAfterYaw = originalZ * Math.cos(Math.toRadians(yaw))
-	                            - originalX * Math.sin(Math.toRadians(yaw));
-	                    double yAfterYaw = originalY;
+	                    double yAfterPitch = originalY * Math.cos(Math.toRadians(pitch)) - originalZ * Math.sin(Math.toRadians(pitch));
+	                    double zAfterPitch = originalY * Math.sin(Math.toRadians(pitch)) + originalZ * Math.cos(Math.toRadians(pitch));
 
-	                    double yAfterPitch = yAfterYaw * Math.cos(Math.toRadians(pitch))
-	                            - zAfterYaw * Math.sin(Math.toRadians(pitch));
-	                    double zAfterPitch = yAfterYaw * Math.sin(Math.toRadians(pitch))
-	                            + zAfterYaw * Math.cos(Math.toRadians(pitch));
+	                    double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + zAfterPitch * Math.sin(Math.toRadians(yaw));
+	                    double zAfterYaw = zAfterPitch * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
 
-	                    rayTarget[0].setLocation(xAfterYaw, yAfterPitch, zAfterPitch);
+	                    rayTarget[0].setLocation(xAfterYaw, yAfterPitch, zAfterYaw);
 	                    for (int k = 1; k < rayTarget.length; k++) {
-	                        rayTarget[k].setLocation((xAfterYaw + k), yAfterPitch, zAfterPitch);
+	                        rayTarget[k].setLocation((xAfterYaw + k), yAfterPitch, zAfterYaw);
 	                    }
 
 	                    RaycastHit hit = Raycast.castRay(getPosition(), rayTarget[0], depth);
@@ -175,7 +174,8 @@ public class Camera {
 	        Thread.currentThread().interrupt();
 	    }
 
-	    g.drawImage(view, 0, 0, null);
+	    g2.drawImage(view, 0, 0, null);
 	}
+
 
 }
