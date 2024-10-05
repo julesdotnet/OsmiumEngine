@@ -20,19 +20,29 @@ public class Vector {
 		return x;
 	}
 	
-	 public void normalize() {
+	 public Vector normalize() {
 	        double len = length();
 	        if (len != 0) {
 	            x /= len;
 	            y /= len;
 	            z /= len;
 	        }
+	        
+	        return this;
 	    }
 	 
 	public Vector multiply(double d) {
 		x *= d;
 		y *= d;
 		z *= d;
+		
+		return this;
+	}
+	
+	public Vector add(Vector v) {
+		x += v.getX();
+		y += v.getY();
+		z += v.getZ();
 		
 		return this;
 	}

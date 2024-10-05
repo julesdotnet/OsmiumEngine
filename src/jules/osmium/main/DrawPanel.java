@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import jules.osmium.object.Cuboid;
 import jules.osmium.object.ObjectHandler;
 import jules.osmium.object.Point;
+import jules.osmium.object.Vector;
 import jules.osmium.renderer.Camera;
 
 public class DrawPanel extends JPanel implements Runnable {
@@ -20,7 +21,7 @@ public class DrawPanel extends JPanel implements Runnable {
 	private long lastFPSUpdateTime = System.nanoTime();
 	private int frames = 0;
 	int fps = 0;
-	private static double speed = 1.5;
+	private static double speed = 2;
 
 	private Thread renderThread;
 	private volatile boolean running = true;
@@ -50,11 +51,13 @@ public class DrawPanel extends JPanel implements Runnable {
 		Cuboid testCuboid3 = new Cuboid(new Point(70, 30, 10), 90, 20, 60, Color.GREEN.getRGB());
 		Cuboid testCuboid4 = new Cuboid(new Point(100, 50, 10), 30, 20, 60, Color.PINK.getRGB());
 		Cuboid testCuboid5 = new Cuboid(new Point(-30, 50, 50), 30, 20, 60, Color.YELLOW.getRGB());
+		Cuboid testCuboid6 = new Cuboid(new Point(-50, 100, 40), 70, 20, 40, Color.CYAN.getRGB());
 		ObjectHandler.spawnCuboid(testCuboid);
 		ObjectHandler.spawnCuboid(testCuboid2);
 		ObjectHandler.spawnCuboid(testCuboid3);
 		ObjectHandler.spawnCuboid(testCuboid4);
 		ObjectHandler.spawnCuboid(testCuboid5);
+		ObjectHandler.spawnCuboid(testCuboid6);
 	}
 
 	float x = 0;
@@ -65,42 +68,40 @@ public class DrawPanel extends JPanel implements Runnable {
 		Graphics2D g2 = (Graphics2D) g.create();
 
 		Camera.setYaw(0);
+		Vector movVec = Camera.cameraDirection2D();
 
 		switch(keyInput.getDirectionAsString()) {
 		case "FORWARD":
-			Camera.moveByVector(Camera.cameraDirection2D().multiply(speed));
+			Camera.moveByVector(movVec.multiply(speed));
 			break;
 			
 		case "BACK":
-			Camera.moveByVector(Camera.cameraDirection2D().reverse().multiply(speed));
+			Camera.moveByVector(movVec.reverse().multiply(speed));
 			break;
 			
 		case "LEFT":
-			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular().multiply(speed));
+			Camera.moveByVector(movVec.getLeftPerpendicular().multiply(speed));
 			break;
 			
 		case "RIGHT":
-			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular().multiply(speed));
+			Camera.moveByVector(movVec.getRightPerpendicular().multiply(speed));
 			break;
-			
 		case "FORWARD_RIGHT":
-			Camera.moveByVector(Camera.cameraDirection2D().multiply(speed));
-			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular().multiply(speed));
+			Camera.moveByVector(movVec.add(movVec.getRightPerpendicular()).normalize().multiply(speed));
 			break;
 			
 		case "FORWARD_LEFT":
-			Camera.moveByVector(Camera.cameraDirection2D().multiply(speed));
-			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular().multiply(speed));
+			Camera.moveByVector(movVec.add(movVec.getLeftPerpendicular()).normalize().multiply(speed));
 			break;
 			
 		case "BACK_RIGHT":
-			Camera.moveByVector(Camera.cameraDirection2D().reverse().multiply(speed));
-			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular().multiply(speed));
+			movVec.reverse();
+			Camera.moveByVector(movVec.add(movVec.getRightPerpendicular().reverse()).normalize().multiply(speed));
 			break;
 			
 		case "BACK_LEFT":
-			Camera.moveByVector(Camera.cameraDirection2D().reverse().multiply(speed));
-			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular().multiply(speed));
+			movVec.reverse();
+			Camera.moveByVector(movVec.add(movVec.getLeftPerpendicular().reverse()).normalize().multiply(speed));
 			break;
 		}
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
