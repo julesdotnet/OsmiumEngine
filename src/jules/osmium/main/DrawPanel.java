@@ -20,19 +20,19 @@ public class DrawPanel extends JPanel implements Runnable {
 	private long lastFPSUpdateTime = System.nanoTime();
 	private int frames = 0;
 	int fps = 0;
-	private static int speed = 3;
+	private static double speed = 1.5;
 
 	private Thread renderThread;
 	private volatile boolean running = true;
 
-	public static KeyInput ki = new KeyInput();
+	public static KeyInput keyInput = new KeyInput();
 	public static MouseInput mi = new MouseInput();
 
 	public DrawPanel() {
 		setPreferredSize(new Dimension(800, 500));
 		setBackground(Color.black);
 		setDoubleBuffered(true);
-		addKeyListener(ki);
+		addKeyListener(keyInput);
 		addMouseMotionListener(mi);
 		setFocusable(true);
 		requestFocus();
@@ -66,20 +66,42 @@ public class DrawPanel extends JPanel implements Runnable {
 
 		Camera.setYaw(0);
 
-		if (DrawPanel.ki.getWPressed()) {
-			Camera.moveByVector(Camera.cameraDirection2D());
-		}
-
-		if (DrawPanel.ki.getSPressed()) {
-			Camera.moveByVector(Camera.cameraDirection2D().reverse());
-		}
-		if (DrawPanel.ki.getAPressed()) {
-			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular());
-		}
-
-		if (DrawPanel.ki.getDPressed()) {
-			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular());
-
+		switch(keyInput.getDirectionAsString()) {
+		case "FORWARD":
+			Camera.moveByVector(Camera.cameraDirection2D().multiply(speed));
+			break;
+			
+		case "BACK":
+			Camera.moveByVector(Camera.cameraDirection2D().reverse().multiply(speed));
+			break;
+			
+		case "LEFT":
+			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular().multiply(speed));
+			break;
+			
+		case "RIGHT":
+			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular().multiply(speed));
+			break;
+			
+		case "FORWARD_RIGHT":
+			Camera.moveByVector(Camera.cameraDirection2D().multiply(speed));
+			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular().multiply(speed));
+			break;
+			
+		case "FORWARD_LEFT":
+			Camera.moveByVector(Camera.cameraDirection2D().multiply(speed));
+			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular().multiply(speed));
+			break;
+			
+		case "BACK_RIGHT":
+			Camera.moveByVector(Camera.cameraDirection2D().reverse().multiply(speed));
+			Camera.moveByVector(Camera.cameraDirection2D().getRightPerpendicular().multiply(speed));
+			break;
+			
+		case "BACK_LEFT":
+			Camera.moveByVector(Camera.cameraDirection2D().reverse().multiply(speed));
+			Camera.moveByVector(Camera.cameraDirection2D().getLeftPerpendicular().multiply(speed));
+			break;
 		}
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
 		g2.dispose();

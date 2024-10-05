@@ -28,6 +28,14 @@ public class Vector {
 	            z /= len;
 	        }
 	    }
+	 
+	public Vector multiply(double d) {
+		x *= d;
+		y *= d;
+		z *= d;
+		
+		return this;
+	}
 
 	public Vector reverse() {
 		x = (-getX());
