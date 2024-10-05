@@ -84,8 +84,6 @@ public class KeyInput implements KeyListener {
         } else {
             current = Direction.NONE;
         }
-
-        System.out.println("Current Direction: " + current);
     }
 
     @Override

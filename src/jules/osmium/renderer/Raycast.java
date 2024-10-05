@@ -25,7 +25,6 @@ public class Raycast {
 		double normalStepSize = 2;
 		double proximityStepSize = 0.1;
 
-		// Calculate total steps to take
 		int steps = (int) Math.min(rayLength / normalStepSize, maxDistance / normalStepSize);
 
 		for (int step = 0; step < steps; step++) {

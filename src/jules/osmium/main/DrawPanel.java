@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
 import jules.osmium.object.Cuboid;
 import jules.osmium.object.ObjectHandler;
 import jules.osmium.object.Point;
-import jules.osmium.object.Vector;
+import jules.osmium.player.FirstPerson;
 import jules.osmium.renderer.Camera;
 
 public class DrawPanel extends JPanel implements Runnable {
@@ -21,7 +21,8 @@ public class DrawPanel extends JPanel implements Runnable {
 	private long lastFPSUpdateTime = System.nanoTime();
 	private int frames = 0;
 	int fps = 0;
-	private static double speed = 2;
+	
+	FirstPerson player = new FirstPerson(this);
 
 	private Thread renderThread;
 	private volatile boolean running = true;
@@ -38,7 +39,7 @@ public class DrawPanel extends JPanel implements Runnable {
 		setFocusable(true);
 		requestFocus();
 		SwingUtilities.invokeLater(() -> requestFocusInWindow());
-
+		
 	}
 
 	public void startRenderThread() {
@@ -67,43 +68,8 @@ public class DrawPanel extends JPanel implements Runnable {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g.create();
 
-		Camera.setYaw(0);
-		Vector movVec = Camera.cameraDirection2D();
-
-		switch(keyInput.getDirectionAsString()) {
-		case "FORWARD":
-			Camera.moveByVector(movVec.multiply(speed));
-			break;
-			
-		case "BACK":
-			Camera.moveByVector(movVec.reverse().multiply(speed));
-			break;
-			
-		case "LEFT":
-			Camera.moveByVector(movVec.getLeftPerpendicular().multiply(speed));
-			break;
-			
-		case "RIGHT":
-			Camera.moveByVector(movVec.getRightPerpendicular().multiply(speed));
-			break;
-		case "FORWARD_RIGHT":
-			Camera.moveByVector(movVec.add(movVec.getRightPerpendicular()).normalize().multiply(speed));
-			break;
-			
-		case "FORWARD_LEFT":
-			Camera.moveByVector(movVec.add(movVec.getLeftPerpendicular()).normalize().multiply(speed));
-			break;
-			
-		case "BACK_RIGHT":
-			movVec.reverse();
-			Camera.moveByVector(movVec.add(movVec.getRightPerpendicular().reverse()).normalize().multiply(speed));
-			break;
-			
-		case "BACK_LEFT":
-			movVec.reverse();
-			Camera.moveByVector(movVec.add(movVec.getLeftPerpendicular().reverse()).normalize().multiply(speed));
-			break;
-		}
+		player.update();
+		
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
 		g2.dispose();
 	}

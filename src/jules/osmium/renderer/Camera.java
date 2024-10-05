@@ -95,6 +95,15 @@ public class Camera {
 		
 		return v;
 	}
+	
+	public static void clampAngle(double upper, double lower) {
+		if(-DrawPanel.mi.cameraPitch < lower) {
+	    	DrawPanel.mi.cameraPitch = (float) lower;
+	    }
+	    else if(-DrawPanel.mi.cameraPitch > upper) {
+	    	DrawPanel.mi.cameraPitch = (float) -upper;
+	    }
+	}
 
 	public static void moveByVector(Vector v) {
 		position.setX(position.getX() + v.getX());
@@ -112,6 +121,7 @@ public class Camera {
 
 	    Camera.setYaw(DrawPanel.mi.cameraYaw);
 	    Camera.setPitch(-DrawPanel.mi.cameraPitch);
+	    Camera.clampAngle(90, -90);
 
 	    BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 

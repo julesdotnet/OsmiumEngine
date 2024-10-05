@@ -1,22 +1,35 @@
 package jules.osmium.main;
 
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+
+import jules.osmium.ui.MainMenu;
 
 public class Window extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
-	DrawPanel dp;
+	public static DrawPanel dp = new DrawPanel();
+	BufferedImage logo;
+	MainMenu mainMenu;
 	
 	private Window() {
-		
-		dp = new DrawPanel();
-		dp.startRenderThread();
+		try {
+			logo = ImageIO.read(this.getClass().getResource("/startscreen_res/iconimage.png"));
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		mainMenu = new MainMenu(this, dp);
 		setTitle("OsmiumEngine | early alpha");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setIconImage(logo);
 		
-		add(dp);
+		add(mainMenu);
 
 		pack();
 		setVisible(true);
