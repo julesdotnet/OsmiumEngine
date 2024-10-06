@@ -5,45 +5,60 @@ import java.awt.image.BufferedImage;
 
 public class RenderingToolkit {
 	public static BufferedImage antiAliase(BufferedImage image) {
-		if (image == null) {
-			return null;
-		}
+	    if (image == null) {
+	        return null;
+	    }
 
-		int width = image.getWidth();
-		int height = image.getHeight();
-		BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	    int width = image.getWidth();
+	    int height = image.getHeight();
+	    BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-		for (int y = 1; y < height - 1; y++) {
-			for (int x = 1; x < width - 1; x++) {
-				// Collect colors from a 3x3 kernel
-				int sumRed = 0, sumGreen = 0, sumBlue = 0, sumAlpha = 0;
-				int count = 0;
+	    for (int y = 1; y < height - 1; y++) {
+	        for (int x = 1; x < width - 1; x++) {
+	            int rgb = image.getRGB(x, y);
+	            Color color = new Color(rgb, true);
 
-				for (int ky = -1; ky <= 1; ky++) {
-					for (int kx = -1; kx <= 1; kx++) {
-						int neighborColor = image.getRGB(x + kx, y + ky);
-						Color neighbor = new Color(neighborColor, true);
+	            if (color.getAlpha() == 0) {
+	                continue;
+	            }
 
-						sumRed += neighbor.getRed();
-						sumGreen += neighbor.getGreen();
-						sumBlue += neighbor.getBlue();
-						sumAlpha += neighbor.getAlpha();
-						count++;
-					}
-				}
+	            int offsetUntilEnd = 0;
 
-				// Calculate the average color
-				int avgRed = sumRed / count;
-				int avgGreen = sumGreen / count;
-				int avgBlue = sumBlue / count;
-				int avgAlpha = sumAlpha / count;
+	            for (int i = 0; i < width; i++) {
+	                int checkX = x + i;
 
-				Color newColor = new Color(avgRed, avgGreen, avgBlue, avgAlpha);
-				output.setRGB(x, y, newColor.getRGB());
-			}
-		}
+	                if (checkX >= width) {
+	                    break;
+	                }
 
-		return output;
+	                Color nextColor = new Color(image.getRGB(checkX, y), true);
+
+	                if (nextColor.getAlpha() != 0) {
+	                    int neighborYUp = y - 1;
+	                    int neighborYDown = y + 1;
+
+	                    boolean upperNeighborValid = neighborYUp >= 0 && new Color(image.getRGB(checkX, neighborYUp), true).getAlpha() != 0;
+	                    boolean lowerNeighborValid = neighborYDown < height && new Color(image.getRGB(checkX, neighborYDown), true).getAlpha() != 0;
+
+	                    if (upperNeighborValid || lowerNeighborValid) {
+	                        offsetUntilEnd = i;
+	                    }
+	                } else {
+	                    break;
+	                }
+	            }
+
+	            for (int i = 0; i <= offsetUntilEnd; i++) {
+	                int weakenedRed = Math.max(0, color.getRed() - (color.getRed() * i) / (offsetUntilEnd + 1));
+	                int weakenedGreen = Math.max(0, color.getGreen() - (color.getGreen() * i) / (offsetUntilEnd + 1));
+	                int weakenedBlue = Math.max(0, color.getBlue() - (color.getBlue() * i) / (offsetUntilEnd + 1));
+	                int weakenedAlpha = Math.max(0, color.getAlpha() - (color.getAlpha() * i) / (offsetUntilEnd + 1));
+
+	                output.setRGB(x + i, y, new Color(weakenedRed, weakenedGreen, weakenedBlue, weakenedAlpha).getRGB());
+	            }
+	        }
+	    }
+
+	    return output;
 	}
-
 }

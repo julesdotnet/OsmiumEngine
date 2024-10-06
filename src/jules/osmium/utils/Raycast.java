@@ -7,13 +7,12 @@ import jules.osmium.object.Vector;
 
 public class Raycast {
 	public static RaycastHit castRay(Point start, Point end, double maxDistance) {
-		// Calculate the direction vector components
 		double rayX = end.getX() - start.getX();
 		double rayY = end.getY() - start.getY();
 		double rayZ = end.getZ() - start.getZ();
 
 		Vector rayDirection = new Vector(rayX, rayY, rayZ);
-		double rayLength = rayDirection.length(); // Assume this method calculates the length directly
+		double rayLength = rayDirection.length(); 
 
 		if (rayLength == 0) {
 			return null;
@@ -28,14 +27,12 @@ public class Raycast {
 		int steps = (int) Math.min(rayLength / normalStepSize, maxDistance / normalStepSize);
 
 		for (int step = 0; step < steps; step++) {
-			// Update current point using the direction vector
 			currentPoint.setX(currentPoint.getX() + rayDirection.getX() * normalStepSize);
 			currentPoint.setY(currentPoint.getY() + rayDirection.getY() * normalStepSize);
 			currentPoint.setZ(currentPoint.getZ() + rayDirection.getZ() * normalStepSize);
 			
 			for(Cuboid object : ObjectHandler.getCuboids()) { 
 				if(object.contains(currentPoint)) {
-					// Update current point using the direction vector
 					currentPoint.setX(currentPoint.getX() - rayDirection.getX() * normalStepSize);
 					currentPoint.setY(currentPoint.getY() - rayDirection.getY() * normalStepSize);
 					currentPoint.setZ(currentPoint.getZ() - rayDirection.getZ() * normalStepSize);

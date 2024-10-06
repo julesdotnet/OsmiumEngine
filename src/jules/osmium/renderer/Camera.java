@@ -208,7 +208,8 @@ public class Camera {
 	        Thread.currentThread().interrupt();
 	    }
 
-	    g2.drawImage(RenderingToolkit.antiAliase(view), 0, 0, null);
+	    //g2.drawImage(RenderingToolkit.antiAliase(view), 0, 0, null);
+	    g2.drawImage(view, 0, 0, null);
 	}
 
 

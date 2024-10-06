@@ -5,7 +5,6 @@ import jules.osmium.object.Vector;
 import jules.osmium.renderer.Camera;
 
 public class FirstPerson {
-	private DrawPanel dp;
 	private static double speed = 2;
 	
 	public FirstPerson(DrawPanel dp) {
