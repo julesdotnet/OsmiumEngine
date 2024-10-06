@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -21,7 +22,6 @@ public class DrawPanel extends JPanel implements Runnable {
 	private long lastFPSUpdateTime = System.nanoTime();
 	private int frames = 0;
 	int fps = 0;
-	
 	FirstPerson player = new FirstPerson(this);
 
 	private Thread renderThread;
@@ -39,7 +39,7 @@ public class DrawPanel extends JPanel implements Runnable {
 		setFocusable(true);
 		requestFocus();
 		SwingUtilities.invokeLater(() -> requestFocusInWindow());
-		
+
 	}
 
 	public void startRenderThread() {
@@ -69,7 +69,7 @@ public class DrawPanel extends JPanel implements Runnable {
 		Graphics2D g2 = (Graphics2D) g.create();
 
 		player.update();
-		
+
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
 		g2.dispose();
 	}
@@ -101,11 +101,11 @@ public class DrawPanel extends JPanel implements Runnable {
 		}
 	}
 
-	// Optional method to stop the render thread gracefully
 	public void stopRenderThread() {
-		running = false; // Set the running flag to false
+		running = false;
 		if (renderThread != null) {
-			renderThread.interrupt(); // Interrupt the thread if it's sleeping
+			renderThread.interrupt();
 		}
 	}
+
 }

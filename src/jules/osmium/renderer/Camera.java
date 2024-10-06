@@ -13,6 +13,8 @@ import jules.osmium.main.DrawPanel;
 import jules.osmium.main.KeyInput;
 import jules.osmium.object.Point;
 import jules.osmium.object.Vector;
+import jules.osmium.utils.Raycast;
+import jules.osmium.utils.RaycastHit;
 
 public class Camera {
 	private static double xAngle;
@@ -113,7 +115,7 @@ public class Camera {
 	
 	static double yOffset = 0;
 
-	public static void renderView(int width, int height, double depth, double fov, Graphics g) {
+	public static void renderView(final int width, final int height, double depth, double fov, Graphics g) {
 	    Graphics2D g2 = (Graphics2D) g.create();
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    yOffset -= 40;
@@ -123,7 +125,8 @@ public class Camera {
 	    Camera.setPitch(-DrawPanel.mi.cameraPitch);
 	    Camera.clampAngle(90, -90);
 
-	    BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	    // Mark width and height as final
+	    final BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 	    double aspectRatio = (double) width / height;
 	    double horizontalFovRadians = Math.toRadians(fov);
@@ -140,6 +143,7 @@ public class Camera {
 	        final int startHeight = threadId * segmentHeight;
 	        final int endHeight = (threadId == numThreads - 1) ? height : startHeight + segmentHeight;
 
+	        // Use lambda, ensuring width, height, and view are final
 	        executor.submit(() -> {
 	            Point[] rayTarget = new Point[6];
 	            for (int i = 0; i < rayTarget.length; i++) {
@@ -158,7 +162,7 @@ public class Camera {
 
 	                    double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw)) + zAfterPitch * Math.sin(Math.toRadians(yaw));
 	                    double zAfterYaw = zAfterPitch * Math.cos(Math.toRadians(yaw)) - originalX * Math.sin(Math.toRadians(yaw));
-	                    
+
 	                    directionVectorX = originalX * Math.sin(Math.toRadians(yaw));
 	                    directionVectorZ = originalZ * Math.cos(Math.toRadians(yaw));
 
@@ -175,7 +179,7 @@ public class Camera {
 	                            for (int dy = 0; dy < rayStepY; dy++) {
 	                                int xPos = i + (width / 2) + dx;
 	                                int yPos = j + (height / 2) + dy;
-	                                if (xPos < width && yPos < height) {
+	                                if (xPos >= 0 && xPos < width && yPos >= 0 && yPos < height) {
 	                                    view.setRGB(xPos, yPos, color);
 	                                }
 	                            }
@@ -186,7 +190,7 @@ public class Camera {
 	                            for (int dy = 0; dy < rayStepY; dy++) {
 	                                int xPos = i + (width / 2) + dx;
 	                                int yPos = j + (height / 2) + dy;
-	                                if (xPos < width && yPos < height) {
+	                                if (xPos >= 0 && xPos < width && yPos >= 0 && yPos < height) {
 	                                    view.setRGB(xPos, yPos, backgroundColor);
 	                                }
 	                            }
@@ -204,8 +208,9 @@ public class Camera {
 	        Thread.currentThread().interrupt();
 	    }
 
-	    g2.drawImage(view, 0, 0, null);
+	    g2.drawImage(RenderingToolkit.antiAliase(view), 0, 0, null);
 	}
+
 
 
 }

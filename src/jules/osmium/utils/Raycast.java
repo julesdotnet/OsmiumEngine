@@ -1,4 +1,4 @@
-package jules.osmium.renderer;
+package jules.osmium.utils;
 
 import jules.osmium.object.Cuboid;
 import jules.osmium.object.ObjectHandler;
