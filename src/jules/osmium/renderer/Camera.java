@@ -1,6 +1,5 @@
 package jules.osmium.renderer;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -8,7 +7,6 @@ import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import jules.osmium.main.DrawPanel;
 import jules.osmium.main.KeyInput;
 import jules.osmium.object.Point;
@@ -29,8 +27,6 @@ public class Camera {
 	private static int rayStepX = 3;
 	private static int rayStepY = 3;
 
-	private static Camera camera;
-
 	private static Point position = new Point(0, 0, 0);
 
 	protected static KeyInput keyInput = new KeyInput();
@@ -39,13 +35,6 @@ public class Camera {
 		Camera.xAngle = xAngle;
 		Camera.yAngle = yAngle;
 		this.depthOfView = depthOfView;
-	}
-
-	public static Camera getInstance() {
-		if (camera == null) {
-			camera = new Camera(60, 45, 200);
-		}
-		return camera;
 	}
 
 	public double getXAngle() {
@@ -130,7 +119,7 @@ public class Camera {
 		double aspectRatio = (double) width / height;
 		double horizontalFovRadians = Math.toRadians(fov);
 
-		double angleX = 2 * Math.tan(horizontalFovRadians / 2);
+		double angleX = 0.65 * Math.tan(horizontalFovRadians / 2) + 0.3;
 		double angleY = angleX / aspectRatio;
 
 		int numThreads = Runtime.getRuntime().availableProcessors();
@@ -200,8 +189,8 @@ public class Camera {
 			Thread.currentThread().interrupt();
 		}
 
-		//g2.drawImage(RenderingToolkit.antiAliase(view), 0, 0, null);
-		g2.drawImage(view, 0, 0, null);
+		g2.drawImage(RenderingToolkit.antiAliase(view), 0, 0, null);
+		// g2.drawImage(view, 0, 0, null);
 	}
-
+	
 }
