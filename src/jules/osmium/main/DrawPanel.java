@@ -71,6 +71,10 @@ public class DrawPanel extends JPanel implements Runnable {
 		player.update();
 
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
+		
+		if(!KeyInput.getEscapeReleased()) {
+			g2.drawString("Paused", 10, 10);
+		}
 		g2.dispose();
 	}
 

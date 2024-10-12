@@ -30,6 +30,7 @@ public class Camera {
 	private static Point position = new Point(0, 0, 0);
 
 	protected static KeyInput keyInput = new KeyInput();
+	static BufferedImage view;
 
 	private Camera(double xAngle, double yAngle, double depthOfView) {
 		Camera.xAngle = xAngle;
@@ -114,7 +115,7 @@ public class Camera {
 		Camera.clampAngle(90, -90);
 
 		// Mark width and height as final
-		final BufferedImage view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		double aspectRatio = (double) width / height;
 		double horizontalFovRadians = Math.toRadians(fov);

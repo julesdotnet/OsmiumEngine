@@ -10,7 +10,8 @@ public class KeyInput implements KeyListener {
     private boolean aPressed = false;
     private boolean sPressed = false;
     private boolean dPressed = false;
-    private boolean escPressed = false;
+
+    private static boolean stopMouseMovement = true;
     
     private Map<Integer, Runnable> bindings = new HashMap<>();
 
@@ -51,7 +52,6 @@ public class KeyInput implements KeyListener {
         });
 
         bindKey(KeyEvent.VK_ESCAPE, () -> {
-            escPressed = true;
         });
     }
 
@@ -103,8 +103,7 @@ public class KeyInput implements KeyListener {
         updateDirection();
 
         if (keyCode == KeyEvent.VK_ESCAPE) {
-            escPressed = false;
-            System.out.println("ESC released");
+            stopMouseMovement = !stopMouseMovement;
         }
     }
 
@@ -117,7 +116,7 @@ public class KeyInput implements KeyListener {
         return current.toString();
     }
 
-    public boolean getEscapeReleased() {
-        return escPressed;
+    public static boolean getEscapeReleased() {
+        return stopMouseMovement;
     }
 }
