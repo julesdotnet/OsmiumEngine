@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import jules.osmium.main.DrawPanel;
 import jules.osmium.main.KeyInput;
+import jules.osmium.object.Cuboid;
+import jules.osmium.object.ObjectHandler;
 import jules.osmium.object.Point;
 import jules.osmium.object.Vector;
 import jules.osmium.utils.Raycast;
@@ -24,7 +26,7 @@ public class Camera {
 
 	private static double directionVectorX = 0;
 	private static double directionVectorZ = 0;
-	private static int rayStepX = 3;
+	private static int rayStepX = 3; 
 	private static int rayStepY = 3;
 
 	private static Point position = new Point(0, 0, 0);
@@ -88,14 +90,6 @@ public class Camera {
 		return v;
 	}
 
-	public static void clampAngle(double upper, double lower) {
-		if (-DrawPanel.mi.cameraPitch < lower) {
-			DrawPanel.mi.cameraPitch = (float) lower;
-		} else if (-DrawPanel.mi.cameraPitch > upper) {
-			DrawPanel.mi.cameraPitch = (float) -upper;
-		}
-	}
-
 	public static void moveByVector(Vector v) {
 		position.setX(position.getX() + v.getX());
 		position.setY(position.getY() + v.getY());
@@ -112,9 +106,7 @@ public class Camera {
 
 		Camera.setYaw(DrawPanel.mi.cameraYaw);
 		Camera.setPitch(-DrawPanel.mi.cameraPitch);
-		Camera.clampAngle(90, -90);
 
-		// Mark width and height as final
 		view = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
 		double aspectRatio = (double) width / height;
@@ -132,7 +124,6 @@ public class Camera {
 			final int startHeight = threadId * segmentHeight;
 			final int endHeight = (threadId == numThreads - 1) ? height : startHeight + segmentHeight;
 
-			// Use lambda, ensuring width, height, and view are final
 			executor.submit(() -> {
 				Point[] rayTarget = new Point[6];
 				for (int i = 0; i < rayTarget.length; i++) {
@@ -150,7 +141,6 @@ public class Camera {
 								- originalZ * Math.sin(Math.toRadians(pitch));
 						double zAfterPitch = originalY * Math.sin(Math.toRadians(pitch))
 								+ originalZ * Math.cos(Math.toRadians(pitch));
-
 						double xAfterYaw = originalX * Math.cos(Math.toRadians(yaw))
 								+ zAfterPitch * Math.sin(Math.toRadians(yaw));
 						double zAfterYaw = zAfterPitch * Math.cos(Math.toRadians(yaw))
@@ -177,6 +167,7 @@ public class Camera {
 									}
 								}
 							}
+							
 						}
 					}
 				}

@@ -2,6 +2,7 @@ package jules.osmium.main;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -47,18 +48,10 @@ public class DrawPanel extends JPanel implements Runnable {
 			renderThread = new Thread(this);
 			renderThread.start();
 		}
-		Cuboid testCuboid = new Cuboid(new Point(30, 5, 100), 80, 60, 60, Color.ORANGE.getRGB());
-		Cuboid testCuboid2 = new Cuboid(new Point(0, 5, 0), 80, 10, 60, Color.RED.getRGB());
-		Cuboid testCuboid3 = new Cuboid(new Point(70, 30, 10), 90, 20, 60, Color.GREEN.getRGB());
-		Cuboid testCuboid4 = new Cuboid(new Point(100, 50, 10), 30, 20, 60, Color.PINK.getRGB());
-		Cuboid testCuboid5 = new Cuboid(new Point(-30, 50, 50), 30, 20, 60, Color.YELLOW.getRGB());
-		Cuboid testCuboid6 = new Cuboid(new Point(-50, 100, 40), 70, 20, 40, Color.CYAN.getRGB());
+		Cuboid testCuboid = new Cuboid(new Point(0, 5, 0), 80, 10, 60, Color.RED.getRGB());
+
 		ObjectHandler.spawnCuboid(testCuboid);
-		ObjectHandler.spawnCuboid(testCuboid2);
-		ObjectHandler.spawnCuboid(testCuboid3);
-		ObjectHandler.spawnCuboid(testCuboid4);
-		ObjectHandler.spawnCuboid(testCuboid5);
-		ObjectHandler.spawnCuboid(testCuboid6);
+
 	}
 
 	float x = 0;
@@ -73,7 +66,9 @@ public class DrawPanel extends JPanel implements Runnable {
 		Camera.renderView(getWidth(), getHeight(), 1200, 60, g);
 		
 		if(!KeyInput.getEscapeReleased()) {
-			g2.drawString("Paused", 10, 10);
+			g2.setColor(Color.red);
+			g2.setFont(new Font("Helvetica", Font.PLAIN, 30));
+			g2.drawString("Paused", 10, 30);
 		}
 		g2.dispose();
 	}
