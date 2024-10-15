@@ -7,14 +7,17 @@ public class Cuboid {
 	private double depth;
 	private int color;
 	private Point[] vertices = new Point[8];
+	public static final int CUBOID_UNIT = 40;
 	
 	
 	public Cuboid(Point location, double width, double length, double depth, int color) {
+		location.setX(location.getX() * CUBOID_UNIT);
+		location.setY(location.getY() * CUBOID_UNIT);
+		location.setZ(location.getZ() * CUBOID_UNIT);
 		this.location = location;
-		this.width = width;
-		this.length= length;
-		this.depth = depth;
-		this.color = color;
+		this.width = width * CUBOID_UNIT;
+		this.length= length * CUBOID_UNIT;
+		this.depth = depth * CUBOID_UNIT;
 		setColor(color);
 		generateVertices();
 	}

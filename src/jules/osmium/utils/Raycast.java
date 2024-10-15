@@ -6,53 +6,92 @@ import jules.osmium.object.Point;
 import jules.osmium.object.Vector;
 
 public class Raycast {
-	public static RaycastHit castRay(Point start, Point end, double maxDistance) {
-		double rayX = end.getX() - start.getX();
-		double rayY = end.getY() - start.getY();
-		double rayZ = end.getZ() - start.getZ();
 
-		Vector rayDirection = new Vector(rayX, rayY, rayZ);
-		double rayLength = rayDirection.length(); 
+    // Grid field size
+    public static final double GRID_SIZE = 40.0;
 
-		if (rayLength == 0) {
-			return null;
-		}
+    // Small tolerance to handle precision issues
+    private static final double EPSILON = 1e-6;
 
-		rayDirection.normalize();
+    public static RaycastHit castRay(Point start, Point end, double maxDistance) {
+        // Ray direction
+        double rayX = end.getX() - start.getX();
+        double rayY = end.getY() - start.getY();
+        double rayZ = end.getZ() - start.getZ();
 
-		Point currentPoint = new Point(start.getX(), start.getY(), start.getZ());
-		Point currentPoint2 = new Point(start.getX() + rayDirection.getX(), start.getY() + rayDirection.getY(), start.getZ() + rayDirection.getZ());
-		Point currentPoint3 = new Point(start.getX() + rayDirection.getX() * 2, start.getY() + rayDirection.getY() * 2, start.getZ() + rayDirection.getZ() * 2);
-		double normalStepSize = 3.5;
-		double proximityStepSize = 0.1;
+        Vector rayDirection = new Vector(rayX, rayY, rayZ);
+        double rayLength = rayDirection.length();
 
-		int steps = (int) Math.min(rayLength / normalStepSize, maxDistance / normalStepSize);
+        if (rayLength == 0) {
+            return null;
+        }
 
-		for (int step = 0; step < steps; step++) {
-			currentPoint.setX(currentPoint.getX() + rayDirection.getX() * normalStepSize);
-			currentPoint.setY(currentPoint.getY() + rayDirection.getY() * normalStepSize);
-			currentPoint.setZ(currentPoint.getZ() + rayDirection.getZ() * normalStepSize);
-			
-			currentPoint2.setX(currentPoint2.getX() + rayDirection.getX() * normalStepSize);
-			currentPoint2.setY(currentPoint2.getY() + rayDirection.getY() * normalStepSize);
-			currentPoint2.setZ(currentPoint.getZ() + rayDirection.getZ() * normalStepSize);
-			
-			currentPoint3.setX(currentPoint2.getX() + rayDirection.getX() * normalStepSize);
-			currentPoint3.setY(currentPoint2.getY() + rayDirection.getY() * normalStepSize);
-			currentPoint3.setZ(currentPoint2.getZ() + rayDirection.getZ() * normalStepSize);
-			
-			for(Cuboid object : ObjectHandler.getCuboids()) { 
-				if(object.contains(currentPoint)) {
-					return new RaycastHit(currentPoint, object.getColor());
-				}
-				if(object.contains(currentPoint2)) {
-					return new RaycastHit(currentPoint, object.getColor());
-				}
-				if(object.contains(currentPoint3)) {
-					return new RaycastHit(currentPoint, object.getColor());
-				}
-			}
-		}
-		return null;
-	}
+        rayDirection.normalize();
+
+        // Calculate the starting voxel
+        int voxelX = (int) Math.floor(start.getX() / GRID_SIZE);
+        int voxelY = (int) Math.floor(start.getY() / GRID_SIZE);
+        int voxelZ = (int) Math.floor(start.getZ() / GRID_SIZE);
+
+        int stepX = rayDirection.getX() > 0 ? 1 : -1;
+        int stepY = rayDirection.getY() > 0 ? 1 : -1;
+        int stepZ = rayDirection.getZ() > 0 ? 1 : -1;
+
+        double tMaxX = calculateTMax(start.getX(), voxelX, rayDirection.getX(), stepX);
+        double tMaxY = calculateTMax(start.getY(), voxelY, rayDirection.getY(), stepY);
+        double tMaxZ = calculateTMax(start.getZ(), voxelZ, rayDirection.getZ(), stepZ);
+
+        double tDeltaX = GRID_SIZE / Math.abs(rayDirection.getX());
+        double tDeltaY = GRID_SIZE / Math.abs(rayDirection.getY());
+        double tDeltaZ = GRID_SIZE / Math.abs(rayDirection.getZ());
+
+        // Cast the ray through the voxel grid
+        while (rayLength > 0) {
+            // Check if the current voxel contains an object
+            Point currentPoint = new Point(voxelX * GRID_SIZE, voxelY * GRID_SIZE, voxelZ * GRID_SIZE);
+            for (Cuboid object : ObjectHandler.getCuboids()) {
+                if (object.contains(currentPoint)) {
+                    return new RaycastHit(currentPoint, object.getColor());
+                }
+            }
+
+            // Move to the next voxel based on which tMax is the smallest
+            if (tMaxX + EPSILON < tMaxY) {
+                if (tMaxX + EPSILON < tMaxZ) {
+                    voxelX += stepX;
+                    tMaxX += tDeltaX;
+                } else {
+                    voxelZ += stepZ;
+                    tMaxZ += tDeltaZ;
+                }
+            } else {
+                if (tMaxY + EPSILON < tMaxZ) {
+                    voxelY += stepY;
+                    tMaxY += tDeltaY;
+                } else {
+                    voxelZ += stepZ;
+                    tMaxZ += tDeltaZ;
+                }
+            }
+
+            // Update remaining ray length
+            rayLength -= Math.min(Math.min(tDeltaX, tDeltaY), tDeltaZ);
+
+            if (rayLength > maxDistance) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    // Calculate tMax for the next voxel boundary
+    private static double calculateTMax(double pos, int voxel, double rayDirection, int step) {
+        if (rayDirection == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        double voxelBoundary = (step > 0) ? (voxel + 1) * GRID_SIZE : voxel * GRID_SIZE;
+        return (voxelBoundary - pos) / rayDirection;
+    }
 }

@@ -48,13 +48,15 @@ public class DrawPanel extends JPanel implements Runnable {
 			renderThread = new Thread(this);
 			renderThread.start();
 		}
-		Cuboid testCuboid = new Cuboid(new Point(0, 5, 0), 80, 10, 60, Color.RED.getRGB());
+		Cuboid testCuboid = new Cuboid(new Point(0, 0, 0), 1, 1, 1, Color.RED.getRGB());
+		Cuboid testCuboid2= new Cuboid(new Point(1, 0, 0), 1, 1, 1, Color.CYAN.getRGB());
+		Cuboid testCuboid3 = new Cuboid(new Point(-1, 0, 0), 1, 1, 1, Color.MAGENTA.getRGB());
 
 		ObjectHandler.spawnCuboid(testCuboid);
+		ObjectHandler.spawnCuboid(testCuboid2);
+		ObjectHandler.spawnCuboid(testCuboid3);
 
 	}
-
-	float x = 0;
 
 	@Override
 	public void paintComponent(Graphics g) {
@@ -92,11 +94,11 @@ public class DrawPanel extends JPanel implements Runnable {
 			try {
 				long sleepTime = (lastTime - System.nanoTime() + OPTIMAL_TIME) / 1000000;
 				if (sleepTime > 0) {
-					Thread.sleep(sleepTime);
+					Thread.sleep(10);
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			} 
 		}
 	}
 

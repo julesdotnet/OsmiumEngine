@@ -113,7 +113,7 @@ public class Camera {
 		double horizontalFovRadians = Math.toRadians(fov);
 
 		double angleX = 0.65 * Math.tan(horizontalFovRadians / 2) + 0.3;
-		double angleY = angleX / aspectRatio;
+		double angleY = angleX / aspectRatio * 1.4;
 
 		int numThreads = Runtime.getRuntime().availableProcessors();
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
@@ -154,7 +154,7 @@ public class Camera {
 							rayTarget[k].setLocation((xAfterYaw + k), yAfterPitch, zAfterYaw);
 						}
 
-						RaycastHit hit = Raycast.castRay(getPosition(), rayTarget[0], depth);
+						RaycastHit hit = Raycast.castRay(getPosition(), rayTarget[0], 1500);
 						if (hit != null) {
 							int color = hit.getColor();
 
